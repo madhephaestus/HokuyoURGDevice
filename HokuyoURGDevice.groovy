@@ -513,31 +513,34 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		return new ArrayList<String>();
 	}
 }
+String name = "lidar";
 
-Set<String> ports = NRSerialPort.getAvailableSerialPorts();
-List<String> choices = new ArrayList<>();
-if(ports.isEmpty()) {
-	println "No device found!"
-	return;
-}
-for (String s: ports){
-	choices.add(s);
-}
-
-
-ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
-dialog.setTitle("LIDAR Serial Port Chooser");
-dialog.setHeaderText("Supports URG-04LX-UG01");
-dialog.setContentText("Lidar Port:");
-Platform.runLater({
-	// Traditional way to get the response value.
-	Optional<String> result = dialog.showAndWait();
+DeviceManager.getSpecificDevice(name,{
+	Set<String> ports = NRSerialPort.getAvailableSerialPorts();
+	List<String> choices = new ArrayList<>();
+	if(ports.isEmpty()) {
+		println "No device found!"
+		return;
+	}
+	for (String s: ports){
+		choices.add(s);
+	}
 	
-	// The Java 8 way to get the response value (with lambda expression).
-	result.ifPresent({letter ->
-		HokuyoURGDevice p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
-		p.connect();
-		String name = "lidar";
-		DeviceManager.addConnection(p, name);
-	});
+	Platform.runLater({
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+		dialog.setTitle("LIDAR Serial Port Chooser");
+		dialog.setHeaderText("Supports URG-04LX-UG01");
+		dialog.setContentText("Lidar Port:");
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+		
+		// The Java 8 way to get the response value (with lambda expression).
+		result.ifPresent({letter ->
+			HokuyoURGDeviceLocal p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
+			p.connect();
+			DeviceManager.addConnection(p, name);
+		});
+	})
+	return null;
 })
+return null
