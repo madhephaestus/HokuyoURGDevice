@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 /**
  * The Class DataPoint.
  */
-public class DataPoint {
+class DataPoint {
 
 	/** The range. */
 	private double range;
@@ -89,7 +89,7 @@ public class DataPoint {
 	}
 }
 
-public class URG2Packet {
+class URG2Packet {
 
 	/** The cmd. */
 	private String cmd;
