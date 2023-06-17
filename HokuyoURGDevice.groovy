@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import com.neuronrobotics.sdk.addons.kinematics.math.RotationNR
+import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 import com.neuronrobotics.sdk.common.BowlerAbstractDevice;
 import com.neuronrobotics.sdk.common.ByteList;
 import com.neuronrobotics.sdk.common.DeviceManager
@@ -86,6 +88,12 @@ class DataPoint {
 	public String toString() {
 		String s="A"+new DecimalFormat("000.00 degrees ").format(angle)+":R"+range+"mm";
 		return s;
+	}
+
+	public TransformNR getPosition() {
+		double x = range * Math.cos( Math.toRadians(angle) )
+		double y = -range * Math.sin( Math.toRadians(angle) )
+		return new TransformNR(x,y,0,new RotationNR())
 	}
 }
 
