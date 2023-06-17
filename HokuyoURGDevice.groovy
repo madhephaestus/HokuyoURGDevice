@@ -525,7 +525,7 @@ DeviceManager.getSpecificDevice(name,{
 	for (String s: ports){
 		choices.add(s);
 	}
-	
+
 	Platform.runLater({
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
 		dialog.setTitle("LIDAR Serial Port Chooser");
@@ -533,7 +533,7 @@ DeviceManager.getSpecificDevice(name,{
 		dialog.setContentText("Lidar Port:");
 		// Traditional way to get the response value.
 		Optional<String> result = dialog.showAndWait();
-		
+
 		// The Java 8 way to get the response value (with lambda expression).
 		result.ifPresent({letter ->
 			HokuyoURGDeviceLocal p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
