@@ -443,7 +443,7 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		}catch(Exception ex){}
 
 	}
-	
+
 	public boolean isConnected() {
 		return serial.isConnected()
 	}
@@ -529,22 +529,28 @@ DeviceManager.getSpecificDevice(name,{
 	for (String s: ports){
 		choices.add(s);
 	}
+	if(ports.size()>1) {
+		Platform.runLater({
+			ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+			dialog.setTitle("LIDAR Serial Port Chooser");
+			dialog.setHeaderText("Supports URG-04LX-UG01");
+			dialog.setContentText("Lidar Port:");
+			// Traditional way to get the response value.
+			Optional<String> result = dialog.showAndWait();
 
-	Platform.runLater({
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
-		dialog.setTitle("LIDAR Serial Port Chooser");
-		dialog.setHeaderText("Supports URG-04LX-UG01");
-		dialog.setContentText("Lidar Port:");
-		// Traditional way to get the response value.
-		Optional<String> result = dialog.showAndWait();
-
-		// The Java 8 way to get the response value (with lambda expression).
-		result.ifPresent({letter ->
-			HokuyoURGDeviceLocal p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
-			p.connect();
-			DeviceManager.addConnection(p, name);
-		});
-	})
-	return null;
+			// The Java 8 way to get the response value (with lambda expression).
+			result.ifPresent({letter ->
+				HokuyoURGDeviceLocal p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
+				p.connect();
+				DeviceManager.addConnection(p, name);
+			});
+		})
+		return null;
+	}else if(ports.size()==1) {
+		HokuyoURGDeviceLocal p = new HokuyoURGDeviceLocal(new NRSerialPort(choices.get(0), 115200));
+		p.connect();
+		return p;
+	}
+	else return null
 })
 return null
