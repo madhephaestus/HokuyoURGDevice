@@ -1,5 +1,7 @@
 
 import gnu.io.NRSerialPort;
+import javafx.application.Platform
+import javafx.scene.control.ChoiceDialog
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 
 import com.neuronrobotics.sdk.common.BowlerAbstractDevice;
 import com.neuronrobotics.sdk.common.ByteList;
+import com.neuronrobotics.sdk.common.DeviceManager
 import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.common.NonBowlerDevice;
 import com.neuronrobotics.sdk.util.ThreadUtil;
@@ -22,13 +25,13 @@ import java.text.DecimalFormat;
  * The Class DataPoint.
  */
 public class DataPoint {
-	
+
 	/** The range. */
 	private double range;
-	
+
 	/** The angle. */
 	private double angle;
-	
+
 	/**
 	 * Instantiates a new data point.
 	 *
@@ -39,7 +42,7 @@ public class DataPoint {
 		this.setRange(range);
 		this.setAngle(angle);
 	}
-	
+
 	/**
 	 * Sets the range.
 	 *
@@ -48,7 +51,7 @@ public class DataPoint {
 	private void setRange(double range) {
 		this.range = range;
 	}
-	
+
 	/**
 	 * range in MM.
 	 *
@@ -57,7 +60,7 @@ public class DataPoint {
 	public double getRange() {
 		return range;
 	}
-	
+
 	/**
 	 * Sets the angle.
 	 *
@@ -66,7 +69,7 @@ public class DataPoint {
 	private void setAngle(double angle) {
 		this.angle = angle;
 	}
-	
+
 	/**
 	 * Gets the angle.
 	 *
@@ -75,7 +78,7 @@ public class DataPoint {
 	public double getAngle() {
 		return angle;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -87,41 +90,41 @@ public class DataPoint {
 }
 
 public class URG2Packet {
-	
+
 	/** The cmd. */
 	private String cmd;
-	
+
 	/** The junk. */
 	String junk;
-	
+
 	/** The status. */
 	String status;
-	
+
 	/** The timestamp. */
 	int timestamp=0;
-	
+
 	/** The data lines. */
 	ByteList dataLines=new ByteList();
-	
+
 	/** The center. */
 	private final int center = 384;
-	
+
 	/** The degrees per angle unit. */
 	private final double degreesPerAngleUnit = 0.352422908;
-	
+
 	/** The start. */
 	private int start;
-	
+
 	/** The end. */
 	private int end;
-	
+
 	/** The steps per data point. */
 	private int stepsPerDataPoint;
-	
+
 	/** The data. */
 	private ArrayList<DataPoint> data=new ArrayList<DataPoint>();
-	
-	
+
+
 	/**
 	 * Instantiates a new UR g2 packet.
 	 *
@@ -157,14 +160,14 @@ public class URG2Packet {
 			}else {
 				throw new RuntimeException("Unknown packet: "+line+" Command="+getCmd());
 			}
-			
+
 		}else if(getCmd().contains("QT")) {
 			//do nothing
 		}else{
 			throw new RuntimeException("Unknown packet: "+line);
 		}
 	}
-	
+
 	/**
 	 * Decode urg.
 	 *
@@ -187,7 +190,7 @@ public class URG2Packet {
 		}
 		return back;
 	}
-	
+
 	/**
 	 * Decode urg.
 	 *
@@ -198,7 +201,7 @@ public class URG2Packet {
 		System.out.println("Decoding string="+data);
 		return decodeURG(data.getBytes());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -214,10 +217,10 @@ public class URG2Packet {
 			s+="\nData: "+getData();
 			s+="\nData Size: "+getData().size();
 		}
-		return s;		
+		return s;
 	}
-	
-	
+
+
 	/**
 	 * Raw byte to int.
 	 *
@@ -241,7 +244,7 @@ public class URG2Packet {
 	public ArrayList<DataPoint> getData() {
 		return data;
 	}
-	
+
 	/**
 	 * Gets the cmd.
 	 *
@@ -250,7 +253,7 @@ public class URG2Packet {
 	public String getCmd() {
 		return cmd;
 	}
-	
+
 	/**
 	 * Sets the cmd.
 	 *
@@ -259,7 +262,7 @@ public class URG2Packet {
 	public void setCmd(String cmd) {
 		this.cmd = cmd;
 	}
-	
+
 }
 
 // TODO: Auto-generated Javadoc
@@ -267,35 +270,35 @@ public class URG2Packet {
  * The Class HokuyoURGDevice.
  */
 public class HokuyoURGDeviceLocal extends NonBowlerDevice{
-	
+
 	/** The serial. */
 	private NRSerialPort serial;
-	
+
 	/** The ins. */
 	private DataInputStream ins;
-	
+
 	/** The outs. */
 	private DataOutputStream outs;
-	
+
 	/** The receive. */
 	private Thread receive;
-	
+
 	/** The center. */
 	private final int center = 384;//from datasheet
-	
+
 	/** The degrees per angle unit. */
 	private final double degreesPerAngleUnit = 0.352422908;//from datasheet
-	
-	
+
+
 	/** The packet. */
 	private URG2Packet packet=null;
-	
+
 	/** The run. */
 	boolean run=true;
-	
+
 	/** The done. */
 	protected boolean done=false;
-	
+
 	/**
 	 * Instantiates a new hokuyo urg device.
 	 *
@@ -304,14 +307,14 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 	public HokuyoURGDeviceLocal(NRSerialPort port){
 		serial=port;
 	}
-	
+
 	/**
 	 * Clear.
 	 */
 	public void clear() {
 		send("QT\n");
 	}
-	
+
 	/**
 	 * Start sweep.
 	 *
@@ -331,11 +334,11 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		scan(degreeToTicks(startDeg),degreeToTicks(endDeg),tick,0,1);
 		ThreadUtil.wait(10);
 		long start = System.currentTimeMillis();
-		 while(getPacket() == null ||!getPacket().getCmd().contains("MD") ){
+		while(getPacket() == null ||!getPacket().getCmd().contains("MD") ){
 			if(System.currentTimeMillis()-start>2000)
 				break;
 			ThreadUtil.wait(10);
-			
+
 		}
 		if(getPacket()==null){
 			System.err.println("Sweep failed, resetting and trying again");
@@ -345,7 +348,7 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		System.out.print("Sweep got packet= "+getPacket());
 		return getPacket();
 	}
-	
+
 	/**
 	 * Degree to ticks.
 	 *
@@ -360,7 +363,7 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 			tick=center*2;
 		return tick;
 	}
-	
+
 	/**
 	 * Scan.
 	 *
@@ -389,7 +392,7 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		cmd+="\n\r";
 		send(cmd);
 	}
-	
+
 	/**
 	 * Send.
 	 *
@@ -401,8 +404,8 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 			outs.write(data.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-		 
+		}
+
 	}
 
 	/**
@@ -432,13 +435,13 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		if(receive!=null){
 			receive.interrupt();
 			while(!done && receive.isAlive());
-			receive=null;
+				receive=null;
 		}
 		try{
 			if(serial.isConnected())
 				serial.disconnect();
 		}catch(Exception ex){}
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -446,56 +449,56 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 	 */
 	@Override
 	public boolean connectDeviceImp() {
-		serial.connect();                                 
-		 
+		serial.connect();
 
-		ins = new DataInputStream(serial.getInputStream());                         
-		 
+
+		ins = new DataInputStream(serial.getInputStream());
+
 		outs = new DataOutputStream(serial.getOutputStream());
-		
+
 		receive = new Thread(){
-			public void run(){
-				setName("HokuyoURGDevice updater");
-				ByteList bl = new ByteList();
-				//System.out.println("Starting listener");
-				while(run && !Thread.interrupted()){
-					try {
-						if(ins.available()>0){
-							while(ins.available()>0 && run && !Thread.interrupted()){
-								int b = ins.read();
-								if(b==10 && bl.get(bl.size()-1)==10){
-									if(bl.size()>0){
-										try{
-											URG2Packet p =new URG2Packet(new String(bl.getBytes()));
-											Log.debug("New Packet: \n"+p);
-											setPacket(p);
-											bl = new ByteList();
-										}catch(Exception ex){
-											setPacket(null);
-											//System.out.println("Unknown packet");
-											//ex.printStackTrace();
+					public void run(){
+						setName("HokuyoURGDevice updater");
+						ByteList bl = new ByteList();
+						//System.out.println("Starting listener");
+						while(run && !Thread.interrupted()){
+							try {
+								if(ins.available()>0){
+									while(ins.available()>0 && run && !Thread.interrupted()){
+										int b = ins.read();
+										if(b==10 && bl.get(bl.size()-1)==10){
+											if(bl.size()>0){
+												try{
+													URG2Packet p =new URG2Packet(new String(bl.getBytes()));
+													Log.debug("New Packet: \n"+p);
+													setPacket(p);
+													bl = new ByteList();
+												}catch(Exception ex){
+													setPacket(null);
+													//System.out.println("Unknown packet");
+													//ex.printStackTrace();
+												}
+
+											}
+										}else{
+											bl.add(b);
 										}
-										
+										ThreadUtil.wait(1);
 									}
 								}else{
-									bl.add(b);
-								}
-								ThreadUtil.wait(1);
-							}
-						}else{
-							
-						}
-					} catch (Exception e) {
 
-						//e.printStackTrace();
-						run=false;
-						
+								}
+							} catch (Exception e) {
+
+								//e.printStackTrace();
+								run=false;
+
+							}
+							try {Thread.sleep(1);} catch (InterruptedException e) {run=false;}
+						}
+						done=true;
 					}
-					try {Thread.sleep(1);} catch (InterruptedException e) {run=false;}
-				}
-				done=true;
-			}
-		};
+				};
 		clear();
 		receive.start();
 		return serial.isConnected();
@@ -512,26 +515,29 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 }
 
 Set<String> ports = NRSerialPort.getAvailableSerialPorts();
-		List<String> choices = new ArrayList<>();
-		if(ports.isEmpty())
-			return;
-		for (String s: ports){
-			choices.add(s);
-		}
+List<String> choices = new ArrayList<>();
+if(ports.isEmpty()) {
+	println "No device found!"
+	return;
+}
+for (String s: ports){
+	choices.add(s);
+}
 
-		
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
-		dialog.setTitle("LIDAR Serial Port Chooser");
-		dialog.setHeaderText("Supports URG-04LX-UG01");
-		dialog.setContentText("Lidar Port:");
 
-		// Traditional way to get the response value.
-		Optional<String> result = dialog.showAndWait();
-		
-		// The Java 8 way to get the response value (with lambda expression).
-		result.ifPresent({letter -> 
-			HokuyoURGDevice p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
-			p.connect();
-			String name = "lidar";
-			DeviceManager.addConnection(p, name);
-		});
+ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+dialog.setTitle("LIDAR Serial Port Chooser");
+dialog.setHeaderText("Supports URG-04LX-UG01");
+dialog.setContentText("Lidar Port:");
+Platform.runLater({
+	// Traditional way to get the response value.
+	Optional<String> result = dialog.showAndWait();
+	
+	// The Java 8 way to get the response value (with lambda expression).
+	result.ifPresent({letter ->
+		HokuyoURGDevice p = new HokuyoURGDeviceLocal(new NRSerialPort(letter, 115200));
+		p.connect();
+		String name = "lidar";
+		DeviceManager.addConnection(p, name);
+	});
+})
