@@ -443,6 +443,10 @@ public class HokuyoURGDeviceLocal extends NonBowlerDevice{
 		}catch(Exception ex){}
 
 	}
+	
+	public boolean isConnected() {
+		return serial.isConnected()
+	}
 
 	/* (non-Javadoc)
 	 * @see com.neuronrobotics.sdk.common.NonBowlerDevice#connectDeviceImp()

@@ -5,4 +5,7 @@ ScriptingEngine.gitScriptRun("https://github.com/madhephaestus/HokuyoURGDevice.g
 
 def lidar  =DeviceManager.getSpecificDevice("lidar")
 
-def sweep = lidar.startSweep(-90, 90, 0.5) 
+while(lidar.isConnected()&& !Thread.interrupted()) {
+	def sweep = lidar.startSweep(-90, 90, 0.5)
+	println sweep
+}
